@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Cammino_Installments>
+			<version>0.1.0</version>
+		</Cammino_Installments>
+	</modules>
+	<global>
+		<models>
+			<installments>
+				<class>Cammino_Installments_Model</class>
+			</installments>
+		</models>
+	</global>
+</config>
