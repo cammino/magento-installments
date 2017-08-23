@@ -11,7 +11,7 @@ class Cammino_Installments_Model_Standard extends Mage_Core_Model_Abstract
 
 		for($i=1.0; $i <= $max_installments; $i++) {
 			$future_value = $this->applyTax($value, $i, $installment_tax);
-			if (($future_value/$i) > $min_installment_value) {
+			if (($future_value/$i) >= $min_installment_value) {
 				$installment_value = ($future_value/$i);
 				$qty = $i;
 			} else {
