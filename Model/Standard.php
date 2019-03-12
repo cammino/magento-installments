@@ -1,6 +1,33 @@
 <?php
 class Cammino_Installments_Model_Standard extends Mage_Core_Model_Abstract
 {
+
+	public function getAllInstallments($value)
+	{
+		$max_installments = floatval(Mage::getStoreConfig("catalog/installments/max_installments"));
+		$min_installment_value = floatval(Mage::getStoreConfig("catalog/installments/min_installment_value"));
+		$installment_tax = floatval(Mage::getStoreConfig("catalog/installments/installment_tax"));
+		$qty = 1.0;
+		$installment_value = floatval($value);
+
+		$all_installments = array();
+
+		for($i=1.0; $i <= $max_installments; $i++) {
+			$future_value = $this->applyTax($value, $i, $installment_tax);
+			if (($future_value/$i) >= $min_installment_value) {
+				$all_installments[] = array (
+					"qty" => $i,
+					"value" => $future_value / $i,
+					"total" => $future_value
+				);
+			} else {
+				break;
+			}
+		}
+
+		return $all_installments;
+	}
+
 	public function getInstallments($value)
 	{
 		$max_installments = floatval(Mage::getStoreConfig("catalog/installments/max_installments"));
