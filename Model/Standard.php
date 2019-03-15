@@ -1,61 +1,96 @@
 <?php
+/**
+ * Standard.php
+ *
+ * @category Cammino
+ * @package  Cammino_Installments
+ * @author   Cammino Digital <suporte@cammino.com.br>
+ * @license  http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
+ * @link     https://github.com/cammino/magento-installments
+ */
+
 class Cammino_Installments_Model_Standard extends Mage_Core_Model_Abstract
 {
 
-	public function getAllInstallments($value)
-	{
-		$max_installments = floatval(Mage::getStoreConfig("catalog/installments/max_installments"));
-		$min_installment_value = floatval(Mage::getStoreConfig("catalog/installments/min_installment_value"));
-		$installment_tax = floatval(Mage::getStoreConfig("catalog/installments/installment_tax"));
-		$qty = 1.0;
-		$installment_value = floatval($value);
+    /**
+     * Function responsible for return all available installments
+     *
+     * @param float $value Product value
+     *
+     * @return array
+     */
+    public function getAllInstallments($value)
+    {
+        $maxInstallments = floatval(Mage::getStoreConfig("catalog/installments/max_installments"));
+        $minInstallmentValue = floatval(Mage::getStoreConfig("catalog/installments/min_installment_value"));
+        $installmentTax = floatval(Mage::getStoreConfig("catalog/installments/installment_tax"));
+        $qty = 1.0;
+        $installmentValue = floatval($value);
 
-		$all_installments = array();
+        $allInstallments = array();
 
-		for($i=1.0; $i <= $max_installments; $i++) {
-			$future_value = $this->applyTax($value, $i, $installment_tax);
-			if (($future_value/$i) >= $min_installment_value) {
-				$all_installments[] = array (
-					"qty" => $i,
-					"value" => $future_value / $i,
-					"total" => $future_value
-				);
-			} else {
-				break;
-			}
-		}
+        for ($i=1.0; $i <= $maxInstallments; $i++) {
+            $futureValue = $this->applyTax($value, $i, $installmentTax);
 
-		return $all_installments;
-	}
+            if (($futureValue/$i) >= $minInstallmentValue) {
+                $allInstallments[] = array(
+                    "qty" => $i,
+                    "value" => $futureValue / $i,
+                    "total" => $futureValue
+                );
+            } else {
+                break;
+            }
+        }
 
-	public function getInstallments($value)
-	{
-		$max_installments = floatval(Mage::getStoreConfig("catalog/installments/max_installments"));
-		$min_installment_value = floatval(Mage::getStoreConfig("catalog/installments/min_installment_value"));
-		$installment_tax = floatval(Mage::getStoreConfig("catalog/installments/installment_tax"));
-		$qty = 1.0;
-		$installment_value = floatval($value);
+        return $allInstallments;
+    }
 
-		for($i=1.0; $i <= $max_installments; $i++) {
-			$future_value = $this->applyTax($value, $i, $installment_tax);
-			if (($future_value/$i) >= $min_installment_value) {
-				$installment_value = ($future_value/$i);
-				$qty = $i;
-			} else {
-				break;
-			}
-		}
+    /**
+     * Function responsible for return max product installment
+     *
+     * @param float $value Product value
+     *
+     * @return array
+     */
+    public function getInstallments($value)
+    {
+        $maxInstallments = floatval(Mage::getStoreConfig("catalog/installments/max_installments"));
+        $minInstallmentValue = floatval(Mage::getStoreConfig("catalog/installments/min_installment_value"));
+        $installmentTax = floatval(Mage::getStoreConfig("catalog/installments/installment_tax"));
+        $qty = 1.0;
+        $installmentValue = floatval($value);
 
-		return array("qty" => $qty, "value" => $installment_value); 
-	}
+        for ($i=1.0; $i <= $maxInstallments; $i++) {
+            $futureValue = $this->applyTax($value, $i, $installmentTax);
+            if (($futureValue/$i) >= $minInstallmentValue) {
+                $installmentValue = ($futureValue/$i);
+                $qty = $i;
+            } else {
+                break;
+            }
+        }
 
-	public function applyTax($value, $n, $tax)
-	{
-		for ($i=1; $i <= $n; $i++) {
-			$value = $value + ($value * ($tax / 100));
-		}
-		return $value;
-	}
+        return array("qty" => $qty, "value" => $installmentValue);
+    }
+
+    /**
+     * Function responsible for apply tax in installment
+     *
+     * @param float $value Product value
+     * @param float $n     Number of installments
+     * @param float $tax   Tax to be applied
+     *
+     * @return float
+     */
+    public function applyTax($value, $n, $tax)
+    {
+        for ($i=1; $i <= $n; $i++) {
+            $value = $value + ($value * ($tax / 100));
+        }
+
+        return $value;
+    }
 
 }
 ?>
